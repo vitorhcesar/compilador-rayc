@@ -1,4 +1,6 @@
 import * as readline from 'readline'
+import { compiler } from '../compiler/compiler'
+import { interpreter } from '../compiler/interpreter'
 
 export const raypiler = readline.createInterface({
   input: process.stdin,
@@ -22,7 +24,13 @@ export const raypilerTerminalCompiler = async () => {
       raypiler.close()
       willContinue = false
     } else {
+      const output = compiler(code)
+      
       console.log('\nYour code: ', code)
+      console.log('Your JavaScript converted code: ', output)
+      console.log('\nInterpreting the code...')
+
+      interpreter(output)
     }
   }
 

@@ -1,1 +1,3 @@
-imprima('dois');
+imprima(1 + 2 - 3)
+imprima(5 + 3 -3)
+imprima(7 - 6)

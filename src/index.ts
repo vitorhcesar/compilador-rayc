@@ -1,9 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import chalk from 'chalk'
+// import chalk from 'chalk'
 
 import { raypilerTerminalCompiler } from './raypiler/raypiler'
 import { compiler } from './compiler/compiler'
+import { interpreter } from './compiler/interpreter'
 
 const args = process.argv
 let haveRunFlag = false
@@ -16,6 +17,7 @@ for (let i = 0; i < args.length; i++) {
   }
 
   pathToCode = args[i]
+  // console.log(args[i])
 }
 
 if (haveRunFlag) {
@@ -27,5 +29,7 @@ if (haveRunFlag) {
 } else {
   const data = fs.readFileSync(path.join(__dirname, pathToCode), 'utf-8')
 
-  console.log(data)
+  // console.log(data)
+  const output = compiler(data)
+  interpreter(output)
 }
