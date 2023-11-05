@@ -7,11 +7,13 @@ export function tokenizer (input: string): Token[] {
   while (cursorPos < input.length) {
     let char = input[cursorPos]
 
+    // Espaço em branco
     if (/\s/.test(char)) {
       cursorPos++
       continue
     }
 
+    // Parenteses
     if (char === '(') {
       tokens.push({ type: 'OpenParenToken' })
       cursorPos++
@@ -24,6 +26,7 @@ export function tokenizer (input: string): Token[] {
       continue
     }
 
+    // Operadores
     if (char === '+') {
       tokens.push({ type: 'PlusToken' })
       cursorPos++
