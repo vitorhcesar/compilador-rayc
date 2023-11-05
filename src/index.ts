@@ -28,6 +28,7 @@ if (haveRunFlag && haveInterpreterFlag) {
   // Recebendo sempre o código e compilando por meio do Raypiler
   console.clear()
   console.log('🔥 Raypiler v0.1')
+  // Iniciando o Raypiler no Terminal
   raypilerTerminalCompiler()
 } else if (haveInterpreterFlag) {
   console.clear()
@@ -49,7 +50,6 @@ if (haveRunFlag && haveInterpreterFlag) {
   } catch (err) {
     throw new Error('Erro ao ler arquivo.')
   }
-
 } else {
   const data = fs.readFileSync(path.join(__dirname, pathToCode), 'utf-8')
 
