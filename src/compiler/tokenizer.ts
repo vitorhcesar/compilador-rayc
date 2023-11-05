@@ -39,6 +39,7 @@ export function tokenizer (input: string): Token[] {
       continue
     }
     
+    // Checando números
     const NUMBERS = /[0-9]/
     if (NUMBERS.test(char)) {
       let value = ''
@@ -52,6 +53,7 @@ export function tokenizer (input: string): Token[] {
       continue
     }
 
+    // Checando letras
     const LETTERS = /[a-z]/i
     if (LETTERS.test(char)) {
       let value = ''
