@@ -1,4 +1,4 @@
-import { BinaryExpressionNode, CallExpressionNode, Node, NumericLiteralNode, Program } from "../types/types";
+import { BinaryExpressionNode, CallExpressionNode, Node, NumericLiteralNode, Program, StringNode } from "../types/types";
 
 export function emitter (program: Program): string {
   const output: string[] = []
@@ -11,6 +11,8 @@ export function emitter (program: Program): string {
         return emitBinaryExpression(node)
       case 'CallExpression':
         return emitCallExpression(node)
+      case 'String':
+        return emitString(node)
       default:
         throw new SyntaxError(`Node desconhecido: ${node}`)
     }
@@ -29,6 +31,16 @@ export function emitter (program: Program): string {
       return `console.log(${emit(node.argument)})`
     } else {
       throw new Error(`Identificador desconhecido na expressão: ${node.identifier}`)
+    }
+  }
+
+  function emitString(node: StringNode) {
+    if (node.Quote.type === 'DobleQuotesToken') {
+      return `"${node.value}"`
+    } else if (node.Quote.type === 'SingleQuotesToken') {
+      return `'${node.value}'`
+    } else {
+      throw new Error(`Erro ao passar String para Javascript: ${node.Quote}, ${node.value}`)
     }
   }
 

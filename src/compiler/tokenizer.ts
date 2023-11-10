@@ -26,6 +26,45 @@ export function tokenizer (input: string): Token[] {
       continue
     }
 
+    // Aspas
+    if (char === '"') {
+      tokens.push({ type: 'DobleQuotesToken' })
+      cursorPos++
+
+      // Validando o que estiver dentro das aspas duplas
+      let value = ''
+      while (input[cursorPos] !== '"') {
+        value += input[cursorPos]
+        cursorPos++
+      }
+
+      tokens.push({ type: 'StringLiteralToken', value })
+      tokens.push({ type: 'DobleQuotesToken' })
+
+      cursorPos++
+
+      continue
+    }
+
+    if (char === "'") {
+      tokens.push({ type: 'SingleQuotesToken' })
+      cursorPos++
+
+      // Validando o que estiver dentro das aspas simples
+      let value = ''
+      while (input[cursorPos] !== "'") {
+        value += input[cursorPos]
+        cursorPos++
+      }
+
+      tokens.push({ type: 'StringLiteralToken', value })
+      tokens.push({ type: 'SingleQuotesToken' })
+
+      cursorPos++
+
+      continue
+    }
+
     // Operadores
     if (char === '+') {
       tokens.push({ type: 'PlusToken' })
