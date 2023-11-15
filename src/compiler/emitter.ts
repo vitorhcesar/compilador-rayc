@@ -1,4 +1,4 @@
-import { BinaryExpressionNode, CallExpressionNode, Node, NumericLiteralNode, Program, StringNode } from "../types/types";
+import { BinaryExpressionNode, CallExpressionNode, Node, NumericLiteralNode, Program, StringNode, VariableCallNode, VariableNode } from "../types/types";
 
 export function emitter (program: Program): string {
   const output: string[] = []
@@ -13,6 +13,10 @@ export function emitter (program: Program): string {
         return emitCallExpression(node)
       case 'String':
         return emitString(node)
+      case 'Variable':
+        return emitVariable(node)
+      case 'VariableCall':
+        return emitVariableCall(node)
       default:
         throw new SyntaxError(`Node desconhecido: ${node}`)
     }
@@ -35,13 +39,23 @@ export function emitter (program: Program): string {
   }
 
   function emitString(node: StringNode) {
-    if (node.Quote.type === 'DobleQuotesToken') {
-      return `"${node.value}"`
-    } else if (node.Quote.type === 'SingleQuotesToken') {
-      return `'${node.value}'`
+    return `'${node.value}'`
+  }
+
+  function emitVariable (node: VariableNode) {
+    if (node.value === undefined) {
+      return `let ${node.name}`
     } else {
-      throw new Error(`Erro ao passar String para Javascript: ${node.Quote}, ${node.value}`)
+      if (node.kind === 'texto') {
+        return `let ${node.name} = '${node.value}'`
+      }
+
+      return `let ${node.name} = ${node.value}` 
     }
+  }
+
+  function emitVariableCall (node: VariableCallNode) {
+    return `${node.value}`
   }
 
   for (const node of program.body) {

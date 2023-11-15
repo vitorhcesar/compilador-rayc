@@ -1,4 +1,7 @@
 export type IdentifierToken = { type: 'Identifier', value: string }
+export type VariableToken = { type: 'VariableToken' }
+export type VariableTypeToken = { type: 'VariableTypeToken', value: VariableKinds }
+export type EqualsToken = { type: 'EqualsToken', value: string }
 export type OpenParenToken = { type: 'OpenParenToken' }
 export type CloseParenToken = { type: 'CloseParenToken' }
 export type DobleQuotesToken = { type: 'DobleQuotesToken' }
@@ -9,29 +12,42 @@ export type PlusToken = { type: 'PlusToken' }
 export type MinusToken = { type: 'MinusToken' }
 
 export type Token =
- | IdentifierToken
- | OpenParenToken
- | CloseParenToken
- | NumericLiteralToken
- | PlusToken
- | MinusToken
- | DobleQuotesToken
- | SingleQuotesToken
- | StringLiteralToken
+  | IdentifierToken
+  | OpenParenToken
+  | CloseParenToken
+  | NumericLiteralToken
+  | PlusToken
+  | MinusToken
+  | DobleQuotesToken
+  | SingleQuotesToken
+  | StringLiteralToken
+  | VariableToken
+  | VariableTypeToken
+  | EqualsToken
 
 export type AdditiveOperator = PlusToken | MinusToken
 export type Quotes = DobleQuotesToken | SingleQuotesToken
 
+export type VariableKinds =
+  'booleano' |
+  'texto' |
+  'inteiro' |
+  'real'
+
 export type NumericLiteralNode = { type: 'NumericLiteral', value: string }
 export type CallExpressionNode = { type: 'CallExpression', identifier: IdentifierToken, argument: Node }
 export type BinaryExpressionNode = { type: 'BinaryExpression', left: Node, right: Node, operator: AdditiveOperator }
-export type StringNode = { type: 'String', Quote: Quotes, value: string }
+export type StringNode = { type: 'String', value: string }
+export type VariableNode = { type: 'Variable', kind: VariableKinds, name: string, value: string | undefined }
+export type VariableCallNode = { type: 'VariableCall', value: string }
 
 export type Node =
   | NumericLiteralNode
   | CallExpressionNode
   | BinaryExpressionNode
   | StringNode
+  | VariableNode
+  | VariableCallNode
 
 export type Program = {
   body: Node[]

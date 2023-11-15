@@ -1,4 +1,5 @@
-import { Token } from "../types/types";
+import { Token, VariableKinds } from "../types/types";
+import { validateVariableType } from "./functions/validate-variable-type";
 
 export function tokenizer (input: string): Token[] {
   const tokens: Token[] = []
@@ -28,7 +29,7 @@ export function tokenizer (input: string): Token[] {
 
     // Aspas
     if (char === '"') {
-      tokens.push({ type: 'DobleQuotesToken' })
+      // tokens.push({ type: 'DobleQuotesToken' })
       cursorPos++
 
       // Validando o que estiver dentro das aspas duplas
@@ -39,7 +40,7 @@ export function tokenizer (input: string): Token[] {
       }
 
       tokens.push({ type: 'StringLiteralToken', value })
-      tokens.push({ type: 'DobleQuotesToken' })
+      // tokens.push({ type: 'DobleQuotesToken' })
 
       cursorPos++
 
@@ -47,7 +48,8 @@ export function tokenizer (input: string): Token[] {
     }
 
     if (char === "'") {
-      tokens.push({ type: 'SingleQuotesToken' })
+      // TODO: Tirar os QUOTES para poder ter acesso direto ao StringLiteral
+      // tokens.push({ type: 'SingleQuotesToken' })
       cursorPos++
 
       // Validando o que estiver dentro das aspas simples
@@ -58,7 +60,7 @@ export function tokenizer (input: string): Token[] {
       }
 
       tokens.push({ type: 'StringLiteralToken', value })
-      tokens.push({ type: 'SingleQuotesToken' })
+      // tokens.push({ type: 'SingleQuotesToken' })
 
       cursorPos++
 
@@ -74,6 +76,13 @@ export function tokenizer (input: string): Token[] {
 
     if (char === '-') {
       tokens.push({ type: 'MinusToken' })
+      cursorPos++
+      continue
+    }
+
+    // Igual -> '='
+    if (char === '=') {
+      tokens.push({ type: 'EqualsToken', value: char })
       cursorPos++
       continue
     }
@@ -102,6 +111,19 @@ export function tokenizer (input: string): Token[] {
         char = input[++cursorPos]!
       }
 
+      // Variável
+      if (value === 'variavel') {
+        tokens.push({ type: 'VariableToken' })
+        continue
+      }
+
+      // Tipo de variável
+      if (validateVariableType(value)) {
+        tokens.push({ type: 'VariableTypeToken', value: value as VariableKinds })
+        continue
+      }
+
+      // Caso seja um identificador
       tokens.push({ type: 'Identifier', value })
       continue
     }
