@@ -15,15 +15,17 @@ let pathToCode: string = ''
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--run') {
     haveRunFlag = true
-  } else if (args[i] === '--interpret') {
+  } else if (args[i] === '--out') {
     haveInterpreterFlag = true
+  } else if (args[i] === '--js') {
+    // TODO: fazer o --js tag, para retornar o JavaScript compilado
   }
 
   pathToCode = args[i]
 }
 
 if (haveRunFlag && haveInterpreterFlag) {
-  throw new Error('Não é possível ter o comando --interpret e --run simultâneamente.')
+  throw new Error('Não é possível ter o comando --out e --run simultâneamente.')
 } else if (haveRunFlag) {
   // Recebendo sempre o código e compilando por meio do Raypiler
   console.clear()

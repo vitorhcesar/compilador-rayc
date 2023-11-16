@@ -1,5 +1,5 @@
 export type IdentifierToken = { type: 'Identifier', value: string }
-export type VariableToken = { type: 'VariableToken' }
+export type VariableToken = { type: 'VariableToken', constant: boolean }
 export type VariableTypeToken = { type: 'VariableTypeToken', value: VariableKinds }
 export type EqualsToken = { type: 'EqualsToken', value: string }
 export type OpenParenToken = { type: 'OpenParenToken' }
@@ -38,7 +38,7 @@ export type NumericLiteralNode = { type: 'NumericLiteral', value: string }
 export type CallExpressionNode = { type: 'CallExpression', identifier: IdentifierToken, argument: Node }
 export type BinaryExpressionNode = { type: 'BinaryExpression', left: Node, right: Node, operator: AdditiveOperator }
 export type StringNode = { type: 'String', value: string }
-export type VariableNode = { type: 'Variable', kind: VariableKinds, name: string, value: string | undefined }
+export type VariableNode = { type: 'Variable', kind: VariableKinds, name: string, value: string | undefined, constant: boolean }
 export type VariableCallNode = { type: 'VariableCall', value: string }
 
 export type Node =

@@ -3,3 +3,4 @@ variavel inteiro idade = 22
 
 imprima("Olá " + nome)
 imprima(567-985+54376-4376)
+imprima('Olá ' + nome + ', você tem ' + idade + ' anos de idade!')

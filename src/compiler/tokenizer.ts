@@ -109,11 +109,21 @@ export function tokenizer (input: string): Token[] {
       while (LETTERS.test(char)) {
         value += char
         char = input[++cursorPos]!
+
+        // Checando se o próximo valor é indefinido
+        if (input[cursorPos] === undefined) {
+          break
+        }
       }
 
       // Variável
       if (value === 'variavel') {
-        tokens.push({ type: 'VariableToken' })
+        tokens.push({ type: 'VariableToken', constant: false })
+        continue
+      } 
+      // Constante
+      if (value === 'constante') {
+        tokens.push({ type: 'VariableToken', constant: true })
         continue
       }
 

@@ -43,14 +43,16 @@ export function emitter (program: Program): string {
   }
 
   function emitVariable (node: VariableNode) {
+    const variableName = node.constant ? 'const' : 'let'
+
     if (node.value === undefined) {
-      return `let ${node.name}`
+      return `${variableName} ${node.name}`
     } else {
       if (node.kind === 'texto') {
-        return `let ${node.name} = '${node.value}'`
+        return `${variableName} ${node.name} = '${node.value}'`
       }
 
-      return `let ${node.name} = ${node.value}` 
+      return `${variableName} ${node.name} = ${node.value}` 
     }
   }
 
