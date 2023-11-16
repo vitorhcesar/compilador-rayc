@@ -1,3 +1,3 @@
-export function interpreter (code: string) {
-  return eval(code)
+export function interpreter(code: string) {
+   return eval(code)
 }
