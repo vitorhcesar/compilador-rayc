@@ -15,7 +15,7 @@ const getValueFromTerminal = () => {
    })
 }
 
-export const raypilerTerminalCompiler = async () => {
+export const raypilerTerminalCompiler = async (debug: boolean) => {
    let willContinue = true
    while (willContinue) {
       const code = await getValueFromTerminal()
@@ -24,7 +24,7 @@ export const raypilerTerminalCompiler = async () => {
          raypiler.close()
          willContinue = false
       } else {
-         const output = compiler(code)
+         const output = compiler(code, debug)
 
          console.log('\nYour code: ', code)
          console.log('Your JavaScript converted code: ', output)

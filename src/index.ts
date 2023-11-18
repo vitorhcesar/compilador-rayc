@@ -11,6 +11,8 @@ function main() {
    let haveRunFlag = false
    let haveInterpreterFlag = false
    let haveJavascriptFlag = false
+   // TODO: Funcionalidade do debug mode
+   let debugMode = false
    let pathToCode: string = ''
 
    for (let i = 0; i < args.length; i++) {
@@ -23,6 +25,10 @@ function main() {
          // TODO: fazer o --js tag, para retornar o JavaScript compilado
       }
 
+      if (args[i] === '--debug') {
+         debugMode = true
+      }
+
       pathToCode = args[i]
    }
 
@@ -33,7 +39,7 @@ function main() {
       console.clear()
       console.log('🔥 Raypiler v0.1')
       // Iniciando o Raypiler no Terminal
-      raypilerTerminalCompiler()
+      raypilerTerminalCompiler(debugMode)
    } else if (haveInterpreterFlag) {
       console.clear()
       console.log('Lendo arquivo no diretório ' + path.join(__dirname, pathToCode) + ' ...')
@@ -42,7 +48,7 @@ function main() {
          const data = fs.readFileSync(path.join(__dirname, pathToCode), 'utf-8')
 
          console.log('Compilando código do arquivo...')
-         const output = compiler(data)
+         const output = compiler(data, debugMode)
 
          console.log('Escrevendo o código compilado no diretório ' + path.join(__dirname, 'output.js') + ' ...')
          try {
@@ -61,13 +67,13 @@ function main() {
       console.log('Arquivo lido!')
 
       console.log('Compilando código...')
-      const output = compiler(data)
+      const output = compiler(data, debugMode)
       console.log('Resultado do compilador:\n')
       console.log(output)
    } else {
       const data = fs.readFileSync(path.join(__dirname, pathToCode), 'utf-8')
 
-      const output = compiler(data)
+      const output = compiler(data, debugMode)
 
       interpreter(output)
    }

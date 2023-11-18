@@ -133,6 +133,12 @@ export function tokenizer(input: string): Token[] {
             continue
          }
 
+         // Literal booleano
+         if (value === 'Verdadeiro' || value === 'Falso') {
+            tokens.push({ type: 'BooleanLiteral', value: value === 'Verdadeiro' ? true : false })
+            continue
+         }
+
          // Caso seja um identificador
          tokens.push({ type: 'Identifier', value })
          continue

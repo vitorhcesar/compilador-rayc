@@ -8,6 +8,7 @@ export type DobleQuotesToken = { type: 'DobleQuotesToken' }
 export type SingleQuotesToken = { type: 'SingleQuotesToken' }
 export type StringLiteralToken = { type: 'StringLiteralToken', value: string }
 export type NumericLiteralToken = { type: 'NumericLiteral', value: string }
+export type BooleanLiteralToken = { type: 'BooleanLiteral', value: boolean }
 export type PlusToken = { type: 'PlusToken' }
 export type MinusToken = { type: 'MinusToken' }
 
@@ -15,12 +16,13 @@ export type Token =
    | IdentifierToken
    | OpenParenToken
    | CloseParenToken
-   | NumericLiteralToken
    | PlusToken
    | MinusToken
    | DobleQuotesToken
    | SingleQuotesToken
    | StringLiteralToken
+   | NumericLiteralToken
+   | BooleanLiteralToken
    | VariableToken
    | VariableTypeToken
    | EqualsToken
@@ -40,6 +42,7 @@ export type BinaryExpressionNode = { type: 'BinaryExpression', left: Node, right
 export type StringNode = { type: 'String', value: string }
 export type VariableNode = { type: 'Variable', kind: VariableKinds, name: string, value: string | undefined, constant: boolean }
 export type VariableCallNode = { type: 'VariableCall', value: string }
+export type VariableAtributtionNode = { type: 'VariableAtributtion', value: string, name: string, kind: VariableKinds }
 
 export type Node =
    | NumericLiteralNode
@@ -48,6 +51,7 @@ export type Node =
    | StringNode
    | VariableNode
    | VariableCallNode
+   | VariableAtributtionNode
 
 export type Program = {
    body: Node[]

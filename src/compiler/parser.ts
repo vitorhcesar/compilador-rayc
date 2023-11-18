@@ -1,10 +1,11 @@
-import { AdditiveOperator, BinaryExpressionNode, CallExpressionNode, IdentifierToken, Node, NumericLiteralNode, NumericLiteralToken, PlusToken, Program, StringLiteralToken, StringNode, Token, VariableCallNode, VariableNode, VariableTypeToken } from "../types/types";
+import { AdditiveOperator, BinaryExpressionNode, BooleanLiteralToken, CallExpressionNode, IdentifierToken, Node, NumericLiteralNode, NumericLiteralToken, PlusToken, Program, StringLiteralToken, StringNode, Token, VariableAtributtionNode, VariableCallNode, VariableNode, VariableTypeToken } from "../types/types";
+import { VariablesInMemory } from "../types/variables-in-memory";
 
 export function parser(tokens: Token[]): Program {
    const program: Program = { body: [] }
 
-   const variables: Array<string> = []
-   const constants: Array<string> = []
+   const variables: Array<VariablesInMemory> = []
+   const constants: Array<VariablesInMemory> = []
    const nativeFunctions: Array<string> = [
       'imprima',
       'se',
@@ -15,7 +16,7 @@ export function parser(tokens: Token[]): Program {
 
    function checkVariables(value: string): boolean {
       for (let i = 0; i < variables.length; i++) {
-         if (value === variables[i]) {
+         if (value === variables[i].name) {
             return true
          }
       }
@@ -23,9 +24,19 @@ export function parser(tokens: Token[]): Program {
       return false
    }
 
+   function checkVariableIndex(value: string): null | number {
+      for (let i = 0; i < variables.length; i++) {
+         if (value === variables[i].name) {
+            return i
+         }
+      }
+
+      return null
+   }
+
    function checkConstants(value: string): boolean {
       for (let i = 0; i < constants.length; i++) {
-         if (value === constants[i]) {
+         if (value === constants[i].name) {
             return true
          }
       }
@@ -48,7 +59,7 @@ export function parser(tokens: Token[]): Program {
    function parse(): Node {
       const token = tokens[current]!
 
-      // Variável
+      // Variável ou Constante
       if (token.type === 'VariableToken') {
          const variableType = tokens[current + 1]
          const variableName = tokens[current + 2]
@@ -72,7 +83,7 @@ export function parser(tokens: Token[]): Program {
                if (constantValue === true) {
                   throw new SyntaxError(`A constante precisa ser inicializada! ${variableType} ${variableName} ${constantValue}`)
                }
-               console.log('Cheguei aqui')
+               // console.log('Cheguei aqui')
 
                return parseVariable(variableType, variableName, undefined, constantValue)
             }
@@ -81,7 +92,7 @@ export function parser(tokens: Token[]): Program {
          if (variableType.type === 'VariableTypeToken') {
             if (variableName.type === 'Identifier') {
                if (equals.type === 'EqualsToken') {
-                  if (variableValue.type === 'NumericLiteral' || variableValue.type === 'StringLiteralToken') {
+                  if (variableValue.type === 'NumericLiteral' || variableValue.type === 'StringLiteralToken' || variableValue.type === 'BooleanLiteral') {
                      return parseVariable(variableType, variableName, variableValue, constantValue)
                   }
                } else {
@@ -103,13 +114,20 @@ export function parser(tokens: Token[]): Program {
       // Identificadores
       if (token.type === 'Identifier') {
          const next = tokens[current + 1]
+         // console.log(next)
 
          // Caso o Identificador seja uma variável
          if (checkVariables(token.value)) {
-            if (next.type === 'PlusToken') {
+            if (next?.type === 'PlusToken') {
                const variableCall = parseVariableCall(token)
 
                return parseBinaryExpressionAny(variableCall, next)
+            }
+
+            if (next?.type === 'EqualsToken') {
+               const variableCall = parseVariableCall(token)
+
+               return parseVariableAtributtion(variableCall)
             }
 
             return parseVariableCall(token)
@@ -117,10 +135,12 @@ export function parser(tokens: Token[]): Program {
 
          // Caso o Identificador seja uma constante
          if (checkConstants(token.value)) {
-            if (next.type === 'PlusToken') {
-               const variableCall = parseVariableCall(token)
-
-               return parseBinaryExpressionAny(variableCall, next)
+            if (next !== undefined) {
+               if (next.type === 'PlusToken') {
+                  const variableCall = parseVariableCall(token)
+   
+                  return parseBinaryExpressionAny(variableCall, next)
+               }
             }
 
             return parseVariableCall(token)
@@ -140,11 +160,11 @@ export function parser(tokens: Token[]): Program {
          }
       }
 
-      // Aspas -> STRING: Tirado as aspas e fazendo apenas parseamento da STRING
+      // STRING: Tirado as aspas e fazendo apenas parseamento da STRING
       if (token.type === 'StringLiteralToken') {
          const next = tokens[current + 1]
 
-         if (next.type === 'PlusToken') {
+         if (next?.type === 'PlusToken') {
             return parseStringConcatenation(token, next)
          }
 
@@ -154,7 +174,7 @@ export function parser(tokens: Token[]): Program {
       throw new SyntaxError(`Token desconhecido: ${token.type}`)
    }
 
-   function parseVariable(type: VariableTypeToken, name: IdentifierToken, value: undefined | NumericLiteralToken | StringLiteralToken, constant: boolean): VariableNode {
+   function parseVariable(type: VariableTypeToken, name: IdentifierToken, value: undefined | NumericLiteralToken | StringLiteralToken | BooleanLiteralToken, constant: boolean): VariableNode {
       // Checando existência do nome da variavél
       if (checkVariables(name.value)) {
          throw new SyntaxError(`Essa variável já existe! ${type.type}, ${value}`)
@@ -171,9 +191,9 @@ export function parser(tokens: Token[]): Program {
       }
 
       if (constant === true) {
-         constants.push(name.value)
+         constants.push({ name: name.value, kind: type.value })
       } else {
-         variables.push(name.value)
+         variables.push({ name: name.value, kind: type.value })
       }
 
       if (value === undefined) {
@@ -193,6 +213,11 @@ export function parser(tokens: Token[]): Program {
          return { type: 'Variable', kind: type.value, name: name.value, value: value.value, constant }
       }
 
+      if (value.type === 'BooleanLiteral' && type.value === 'booleano') {
+         current = current + 5
+         return { type: 'Variable', kind: type.value, name: name.value, value: `${value.value}`, constant }
+      }
+
       throw new SyntaxError(`Erro fazendo o parseamento da Variável: ${type.type}, ${value.type}`)
    }
 
@@ -200,6 +225,35 @@ export function parser(tokens: Token[]): Program {
       current++
       return { type: 'VariableCall', value: token.value }
    }
+
+   function parseVariableAtributtion(token: VariableCallNode): VariableAtributtionNode {
+      const VariableCall = token
+      // ID da variável no Variables
+      const id = checkVariableIndex(VariableCall.value)
+
+      current++ // Passando o Equals
+      const next = parse()
+
+      if (next.type === 'String') {
+         if (id !== null) {
+            if (variables[id].kind === 'texto') {
+               return { type: 'VariableAtributtion', value: next.value, name: VariableCall.value, kind: 'texto' }
+            }
+         }
+
+         throw new SyntaxError(`Erro com o Tipo da Variável! Tipo texto não pode receber ${next.type}`)
+      } else if (next.type === 'NumericLiteral') {
+         if (id !== null) {
+            if (variables[id].kind === 'inteiro') {
+               return { type: 'VariableAtributtion', value: next.value, name: VariableCall.value, kind: 'inteiro' }
+            }
+         }
+
+         throw new SyntaxError(`Erro com o Tipo da Variável! Tipo texto não pode receber ${next.type}`)
+      }
+
+      throw new SyntaxError(`Erro na atribuição de variável: ${VariableCall.value}, ${next.type}`)
+   } 
 
    function parseStringOnQuotes(token: StringLiteralToken): StringNode {
       current++

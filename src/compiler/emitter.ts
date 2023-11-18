@@ -1,4 +1,4 @@
-import { BinaryExpressionNode, CallExpressionNode, Node, NumericLiteralNode, Program, StringNode, VariableCallNode, VariableNode } from "../types/types";
+import { BinaryExpressionNode, CallExpressionNode, Node, NumericLiteralNode, Program, StringNode, VariableAtributtionNode, VariableCallNode, VariableNode } from "../types/types";
 
 export function emitter(program: Program): string {
    const output: string[] = []
@@ -17,6 +17,8 @@ export function emitter(program: Program): string {
             return emitVariable(node)
          case 'VariableCall':
             return emitVariableCall(node)
+         case 'VariableAtributtion':
+            return emitVariableAtributtion(node)
          default:
             throw new SyntaxError(`Node desconhecido: ${node}`)
       }
@@ -52,12 +54,22 @@ export function emitter(program: Program): string {
             return `${variableName} ${node.name} = '${node.value}'`
          }
 
+         // Booleano, inteiro, real
          return `${variableName} ${node.name} = ${node.value}`
       }
    }
 
    function emitVariableCall(node: VariableCallNode) {
       return `${node.value}`
+   }
+
+   function emitVariableAtributtion(node: VariableAtributtionNode) {
+      if (node.kind === 'texto') {
+         return `${node.name} = '${node.value}'`
+      }
+
+      // Inteiro, booleano
+      return `${node.name} = ${node.value}`
    }
 
    for (const node of program.body) {
