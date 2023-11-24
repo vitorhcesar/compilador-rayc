@@ -1,8 +1,7 @@
 export function validateVariableType(value: string) {
    switch (value) {
       case 'booleano':
-      case 'inteiro':
-      case 'real':
+      case 'numero':
       case 'texto':
          return true
       default:

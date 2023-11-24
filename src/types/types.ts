@@ -33,8 +33,7 @@ export type Quotes = DobleQuotesToken | SingleQuotesToken
 export type VariableKinds =
    'booleano' |
    'texto' |
-   'inteiro' |
-   'real'
+   'numero'
 
 export type NumericLiteralNode = { type: 'NumericLiteral', value: string }
 export type CallExpressionNode = { type: 'CallExpression', identifier: IdentifierToken, argument: Node }

@@ -54,7 +54,7 @@ export function emitter(program: Program): string {
             return `${variableName} ${node.name} = '${node.value}'`
          }
 
-         // Booleano, inteiro, real
+         // Booleano, numero
          return `${variableName} ${node.name} = ${node.value}`
       }
    }
@@ -68,7 +68,7 @@ export function emitter(program: Program): string {
          return `${node.name} = '${node.value}'`
       }
 
-      // Inteiro, booleano
+      // numero, booleano
       return `${node.name} = ${node.value}`
    }
 

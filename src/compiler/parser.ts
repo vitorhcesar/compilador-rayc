@@ -208,7 +208,7 @@ export function parser(tokens: Token[]): Program {
          return { type: 'Variable', kind: type.value, name: name.value, value: value.value, constant }
       }
 
-      if (value.type === 'NumericLiteral' && type.value === 'inteiro') {
+      if (value.type === 'NumericLiteral' && type.value === 'numero') {
          current = current + 5
          return { type: 'Variable', kind: type.value, name: name.value, value: value.value, constant }
       }
@@ -244,8 +244,8 @@ export function parser(tokens: Token[]): Program {
          throw new SyntaxError(`Erro com o Tipo da Variável! Tipo texto não pode receber ${next.type}`)
       } else if (next.type === 'NumericLiteral') {
          if (id !== null) {
-            if (variables[id].kind === 'inteiro') {
-               return { type: 'VariableAtributtion', value: next.value, name: VariableCall.value, kind: 'inteiro' }
+            if (variables[id].kind === 'numero') {
+               return { type: 'VariableAtributtion', value: next.value, name: VariableCall.value, kind: 'numero' }
             }
          }
 
