@@ -1,5 +1,6 @@
 variavel texto nome = "Vítor"
 variavel numero idade = 22
+constante booleano humano = Verdadeiro
 
 imprima("Olá " + nome)
 imprima(567-985+54376-4376)
@@ -7,3 +8,4 @@ imprima('Olá ' + nome + ', você tem ' + idade + ' anos de idade!')
 
 nome = 'Rayssa'
 imprima('Variavel nome após a modificação '+ nome)
+imprima(humano)
