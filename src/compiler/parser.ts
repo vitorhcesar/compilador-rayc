@@ -1,321 +1,434 @@
-import { AdditiveOperator, BinaryExpressionNode, BooleanLiteralToken, CallExpressionNode, IdentifierToken, Node, NumericLiteralNode, NumericLiteralToken, PlusToken, Program, StringLiteralToken, StringNode, Token, VariableAtributtionNode, VariableCallNode, VariableNode, VariableTypeToken } from "../types/types";
+import {
+  AdditiveOperator,
+  BinaryExpressionNode,
+  BooleanLiteralToken,
+  CallExpressionNode,
+  IdentifierToken,
+  Node,
+  NumericLiteralNode,
+  NumericLiteralToken,
+  PlusToken,
+  Program,
+  StringLiteralToken,
+  StringNode,
+  Token,
+  VariableAtributtionNode,
+  VariableCallNode,
+  VariableNode,
+  VariableTypeToken,
+} from "../types/types";
 import { VariablesInMemory } from "../types/variables-in-memory";
 
 export function parser(tokens: Token[]): Program {
-   const program: Program = { body: [] }
+  const program: Program = { body: [] };
 
-   const variables: Array<VariablesInMemory> = []
-   const constants: Array<VariablesInMemory> = []
-   const nativeFunctions: Array<string> = [
-      'imprima',
-      'se',
-      'senao',
-      'leia',
-   ]
-   const functions: Array<Array<string>> = []
+  const variables: Array<VariablesInMemory> = [];
+  const constants: Array<VariablesInMemory> = [];
+  const nativeFunctions: Array<string> = ["imprima", "se", "senao", "leia"];
+  const functions: Array<Array<string>> = [];
 
-   function checkVariables(value: string): boolean {
-      for (let i = 0; i < variables.length; i++) {
-         if (value === variables[i].name) {
-            return true
-         }
+  function checkVariables(value: string): boolean {
+    for (let i = 0; i < variables.length; i++) {
+      if (value === variables[i].name) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function checkVariableIndex(value: string): null | number {
+    for (let i = 0; i < variables.length; i++) {
+      if (value === variables[i].name) {
+        return i;
+      }
+    }
+
+    return null;
+  }
+
+  function checkConstants(value: string): boolean {
+    for (let i = 0; i < constants.length; i++) {
+      if (value === constants[i].name) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function checkNativeFunctions(value: string): boolean {
+    for (let i = 0; i < nativeFunctions.length; i++) {
+      if (value === nativeFunctions[i]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  let current = 0;
+
+  function parse(): Node {
+    const token = tokens[current]!;
+
+    // Variável ou Constante
+    if (token.type === "VariableToken") {
+      const variableType = tokens[current + 1];
+      const variableName = tokens[current + 2];
+      const equals = tokens[current + 3];
+      const variableValue = tokens[current + 4];
+
+      // Verificando se é constante ou não
+      const constantValue = token.constant;
+
+      // console.log(`Achei o token de VariableToken, 1 ${variableType.type}, 2 ${variableName.type}, 3 ${equals.type}, 4 ${variableValue.type}`)
+      // console.log(`Achei o token de VariableToken, 1 ${variableType}, 2 ${variableName}, 3 ${equals}, 4 ${variableValue}`)
+
+      // Caso algum dos valores importantes seja nulo ou indefinido
+      if (variableType === undefined || variableName === undefined) {
+        throw new SyntaxError(
+          `O nome da variável ou o tipo precisam ser definidos! ${token}`
+        );
       }
 
-      return false
-   }
+      // Se o valor do Equals for indefinido ou nulo
+      if (equals === undefined) {
+        if (
+          variableType.type === "VariableTypeToken" &&
+          variableName.type === "Identifier"
+        ) {
+          if (constantValue === true) {
+            throw new SyntaxError(
+              `A constante precisa ser inicializada! ${variableType} ${variableName} ${constantValue}`
+            );
+          }
+          // console.log('Cheguei aqui')
 
-   function checkVariableIndex(value: string): null | number {
-      for (let i = 0; i < variables.length; i++) {
-         if (value === variables[i].name) {
-            return i
-         }
+          return parseVariable(
+            variableType,
+            variableName,
+            undefined,
+            constantValue
+          );
+        }
       }
 
-      return null
-   }
-
-   function checkConstants(value: string): boolean {
-      for (let i = 0; i < constants.length; i++) {
-         if (value === constants[i].name) {
-            return true
-         }
-      }
-
-      return false
-   }
-
-   function checkNativeFunctions(value: string): boolean {
-      for (let i = 0; i < nativeFunctions.length; i++) {
-         if (value === nativeFunctions[i]) {
-            return true
-         }
-      }
-
-      return false
-   }
-
-   let current = 0
-
-   function parse(): Node {
-      const token = tokens[current]!
-
-      // Variável ou Constante
-      if (token.type === 'VariableToken') {
-         const variableType = tokens[current + 1]
-         const variableName = tokens[current + 2]
-         const equals = tokens[current + 3]
-         const variableValue = tokens[current + 4]
-
-         // Verificando se é constante ou não
-         const constantValue = token.constant
-
-         // console.log(`Achei o token de VariableToken, 1 ${variableType.type}, 2 ${variableName.type}, 3 ${equals.type}, 4 ${variableValue.type}`)
-         // console.log(`Achei o token de VariableToken, 1 ${variableType}, 2 ${variableName}, 3 ${equals}, 4 ${variableValue}`)
-
-         // Caso algum dos valores importantes seja nulo ou indefinido
-         if (variableType === undefined || variableName === undefined) {
-            throw new SyntaxError(`O nome da variável ou o tipo precisam ser definidos! ${token}`)
-         }
-
-         // Se o valor do Equals for indefinido ou nulo 
-         if (equals === undefined) {
-            if (variableType.type === 'VariableTypeToken' && variableName.type === 'Identifier') {
-               if (constantValue === true) {
-                  throw new SyntaxError(`A constante precisa ser inicializada! ${variableType} ${variableName} ${constantValue}`)
-               }
-               // console.log('Cheguei aqui')
-
-               return parseVariable(variableType, variableName, undefined, constantValue)
+      if (variableType.type === "VariableTypeToken") {
+        if (variableName.type === "Identifier") {
+          if (equals.type === "EqualsToken") {
+            if (
+              variableValue.type === "NumericLiteral" ||
+              variableValue.type === "StringLiteralToken" ||
+              variableValue.type === "BooleanLiteral"
+            ) {
+              return parseVariable(
+                variableType,
+                variableName,
+                variableValue,
+                constantValue
+              );
             }
-         }
+          } else {
+            // Se o 'equals' não for do tipo equals
 
-         if (variableType.type === 'VariableTypeToken') {
-            if (variableName.type === 'Identifier') {
-               if (equals.type === 'EqualsToken') {
-                  if (variableValue.type === 'NumericLiteral' || variableValue.type === 'StringLiteralToken' || variableValue.type === 'BooleanLiteral') {
-                     return parseVariable(variableType, variableName, variableValue, constantValue)
-                  }
-               } else {
-                  // Se o 'equals' não for do tipo equals
-
-                  // Se a variável for constante soltar um erro
-                  if (constantValue === true) {
-                     throw new SyntaxError(`A constante precisa ser iniciada, ${variableType} ${variableName} ${constantValue}`)
-                  }
-
-                  return parseVariable(variableType, variableName, undefined, constantValue)
-               }
-            }
-         }
-
-         throw new SyntaxError(`Erro ao passar Variável: ${token.type}, ${variableType}, ${variableName}, ${equals}, ${variableValue}`)
-      }
-
-      // Identificadores
-      if (token.type === 'Identifier') {
-         const next = tokens[current + 1]
-         // console.log(next)
-
-         // Caso o Identificador seja uma variável
-         if (checkVariables(token.value)) {
-            if (next?.type === 'PlusToken') {
-               const variableCall = parseVariableCall(token)
-
-               return parseBinaryExpressionAny(variableCall, next)
+            // Se a variável for constante soltar um erro
+            if (constantValue === true) {
+              throw new SyntaxError(
+                `A constante precisa ser iniciada, ${variableType} ${variableName} ${constantValue}`
+              );
             }
 
-            if (next?.type === 'EqualsToken') {
-               const variableCall = parseVariableCall(token)
-
-               return parseVariableAtributtion(variableCall)
-            }
-
-            return parseVariableCall(token)
-         }
-
-         // Caso o Identificador seja uma constante
-         if (checkConstants(token.value)) {
-            if (next !== undefined) {
-               if (next.type === 'PlusToken') {
-                  const variableCall = parseVariableCall(token)
-   
-                  return parseBinaryExpressionAny(variableCall, next)
-               }
-            }
-
-            return parseVariableCall(token)
-         }
-
-         return parseCallExpression(token)
+            return parseVariable(
+              variableType,
+              variableName,
+              undefined,
+              constantValue
+            );
+          }
+        }
       }
 
-      // Literal Numérico
-      if (token.type === 'NumericLiteral') {
-         const next = tokens[current + 1]
+      throw new SyntaxError(
+        `Erro ao passar Variável: ${token.type}, ${variableType}, ${variableName}, ${equals}, ${variableValue}`
+      );
+    }
 
-         if (next?.type === 'PlusToken' || next?.type === 'MinusToken') {
-            return parseBinaryExpression(token, next)
-         } else {
-            return parseNumericLiteral(token)
-         }
+    // Identificadores
+    if (token.type === "Identifier") {
+      const next = tokens[current + 1];
+      // console.log(next)
+
+      // Caso o Identificador seja uma variável
+      if (checkVariables(token.value)) {
+        if (next?.type === "PlusToken") {
+          const variableCall = parseVariableCall(token);
+
+          return parseBinaryExpressionAny(variableCall, next);
+        }
+
+        if (next?.type === "EqualsToken") {
+          const variableCall = parseVariableCall(token);
+
+          return parseVariableAtributtion(variableCall);
+        }
+
+        return parseVariableCall(token);
       }
 
-      // STRING: Tirado as aspas e fazendo apenas parseamento da STRING
-      if (token.type === 'StringLiteralToken') {
-         const next = tokens[current + 1]
+      // Caso o Identificador seja uma constante
+      if (checkConstants(token.value)) {
+        if (next !== undefined) {
+          if (next.type === "PlusToken") {
+            const variableCall = parseVariableCall(token);
 
-         if (next?.type === 'PlusToken') {
-            return parseStringConcatenation(token, next)
-         }
+            return parseBinaryExpressionAny(variableCall, next);
+          }
+        }
 
-         return parseStringOnQuotes(token)
+        return parseVariableCall(token);
       }
 
-      throw new SyntaxError(`Token desconhecido: ${token.type}`)
-   }
+      return parseCallExpression(token);
+    }
 
-   function parseVariable(type: VariableTypeToken, name: IdentifierToken, value: undefined | NumericLiteralToken | StringLiteralToken | BooleanLiteralToken, constant: boolean): VariableNode {
-      // Checando existência do nome da variavél
-      if (checkVariables(name.value)) {
-         throw new SyntaxError(`Essa variável já existe! ${type.type}, ${value}`)
-      }
+    // Literal Numérico
+    if (token.type === "NumericLiteral") {
+      const next = tokens[current + 1];
 
-      // Checando existência como constante
-      if (checkConstants(name.value)) {
-         throw new SyntaxError(`Essa variável já existe como constante! ${type.type}, ${value}`)
-      }
-
-      // TODO: Checar se a variável tem o nome de uma função nativa ou função criada
-      if (checkNativeFunctions(name.value)) {
-         throw new SyntaxError(`Essa variável já existe como função nativa! ${type.type}, ${value}`)
-      }
-
-      if (constant === true) {
-         constants.push({ name: name.value, kind: type.value })
+      if (next?.type === "PlusToken" || next?.type === "MinusToken") {
+        return parseBinaryExpression(token, next);
       } else {
-         variables.push({ name: name.value, kind: type.value })
+        return parseNumericLiteral(token);
+      }
+    }
+
+    // STRING: Tirado as aspas e fazendo apenas parseamento da STRING
+    if (token.type === "StringLiteralToken") {
+      const next = tokens[current + 1];
+
+      if (next?.type === "PlusToken") {
+        return parseStringConcatenation(token, next);
       }
 
-      if (value === undefined) {
-         current = current + 3
+      return parseStringOnQuotes(token);
+    }
 
-         return { type: 'Variable', kind: type.value, name: name.value, value: undefined, constant }
+    throw new SyntaxError(`Token desconhecido: ${token.type}`);
+  }
+
+  function parseVariable(
+    type: VariableTypeToken,
+    name: IdentifierToken,
+    value:
+      | undefined
+      | NumericLiteralToken
+      | StringLiteralToken
+      | BooleanLiteralToken,
+    constant: boolean
+  ): VariableNode {
+    // Checando existência do nome da variavél
+    if (checkVariables(name.value)) {
+      throw new SyntaxError(`Essa variável já existe! ${type.type}, ${value}`);
+    }
+
+    // Checando existência como constante
+    if (checkConstants(name.value)) {
+      throw new SyntaxError(
+        `Essa variável já existe como constante! ${type.type}, ${value}`
+      );
+    }
+
+    // TODO: Checar se a variável tem o nome de uma função nativa ou função criada
+    if (checkNativeFunctions(name.value)) {
+      throw new SyntaxError(
+        `Essa variável já existe como função nativa! ${type.type}, ${value}`
+      );
+    }
+
+    if (constant === true) {
+      constants.push({ name: name.value, kind: type.value });
+    } else {
+      variables.push({ name: name.value, kind: type.value });
+    }
+
+    if (value === undefined) {
+      current = current + 3;
+
+      return {
+        type: "Variable",
+        kind: type.value,
+        name: name.value,
+        value: undefined,
+        constant,
+      };
+    }
+
+    if (value.type === "StringLiteralToken" && type.value === "texto") {
+      current = current + 5;
+
+      return {
+        type: "Variable",
+        kind: type.value,
+        name: name.value,
+        value: value.value,
+        constant,
+      };
+    }
+
+    if (value.type === "NumericLiteral" && type.value === "numero") {
+      current = current + 5;
+      return {
+        type: "Variable",
+        kind: type.value,
+        name: name.value,
+        value: value.value,
+        constant,
+      };
+    }
+
+    if (value.type === "BooleanLiteral" && type.value === "booleano") {
+      current = current + 5;
+      return {
+        type: "Variable",
+        kind: type.value,
+        name: name.value,
+        value: `${value.value}`,
+        constant,
+      };
+    }
+
+    throw new SyntaxError(
+      `Erro fazendo o parseamento da Variável: ${type.type}, ${value.type}`
+    );
+  }
+
+  function parseVariableCall(token: IdentifierToken): VariableCallNode {
+    current++;
+    return { type: "VariableCall", value: token.value };
+  }
+
+  function parseVariableAtributtion(
+    token: VariableCallNode
+  ): VariableAtributtionNode {
+    const VariableCall = token;
+    // ID da variável no Variables
+    const id = checkVariableIndex(VariableCall.value);
+
+    current++; // Passando o Equals
+    const next = parse();
+
+    if (next.type === "String") {
+      if (id !== null) {
+        if (variables[id].kind === "texto") {
+          return {
+            type: "VariableAtributtion",
+            value: next.value,
+            name: VariableCall.value,
+            kind: "texto",
+          };
+        }
       }
 
-      if (value.type === 'StringLiteralToken' && type.value === 'texto') {
-         current = current + 5
-
-         return { type: 'Variable', kind: type.value, name: name.value, value: value.value, constant }
+      throw new SyntaxError(
+        `Erro com o Tipo da Variável! Tipo texto não pode receber ${next.type}`
+      );
+    } else if (next.type === "NumericLiteral") {
+      if (id !== null) {
+        if (variables[id].kind === "numero") {
+          return {
+            type: "VariableAtributtion",
+            value: next.value,
+            name: VariableCall.value,
+            kind: "numero",
+          };
+        }
       }
 
-      if (value.type === 'NumericLiteral' && type.value === 'numero') {
-         current = current + 5
-         return { type: 'Variable', kind: type.value, name: name.value, value: value.value, constant }
-      }
+      throw new SyntaxError(
+        `Erro com o Tipo da Variável! Tipo texto não pode receber ${next.type}`
+      );
+    }
 
-      if (value.type === 'BooleanLiteral' && type.value === 'booleano') {
-         current = current + 5
-         return { type: 'Variable', kind: type.value, name: name.value, value: `${value.value}`, constant }
-      }
+    throw new SyntaxError(
+      `Erro na atribuição de variável: ${VariableCall.value}, ${next.type}`
+    );
+  }
 
-      throw new SyntaxError(`Erro fazendo o parseamento da Variável: ${type.type}, ${value.type}`)
-   }
+  function parseStringOnQuotes(token: StringLiteralToken): StringNode {
+    current++;
+    return { type: "String", value: token.value };
+  }
 
-   function parseVariableCall(token: IdentifierToken): VariableCallNode {
-      current++
-      return { type: 'VariableCall', value: token.value }
-   }
+  function parseStringConcatenation(
+    token: StringLiteralToken,
+    operator: PlusToken
+  ): BinaryExpressionNode {
+    const left = parseStringOnQuotes(token);
 
-   function parseVariableAtributtion(token: VariableCallNode): VariableAtributtionNode {
-      const VariableCall = token
-      // ID da variável no Variables
-      const id = checkVariableIndex(VariableCall.value)
+    current++;
+    const right: Node = parse();
 
-      current++ // Passando o Equals
-      const next = parse()
+    return { type: "BinaryExpression", left, operator, right };
+  }
 
-      if (next.type === 'String') {
-         if (id !== null) {
-            if (variables[id].kind === 'texto') {
-               return { type: 'VariableAtributtion', value: next.value, name: VariableCall.value, kind: 'texto' }
-            }
-         }
+  function parseBinaryExpressionAny(
+    node: Node,
+    next: AdditiveOperator
+  ): BinaryExpressionNode {
+    const left = node;
 
-         throw new SyntaxError(`Erro com o Tipo da Variável! Tipo texto não pode receber ${next.type}`)
-      } else if (next.type === 'NumericLiteral') {
-         if (id !== null) {
-            if (variables[id].kind === 'numero') {
-               return { type: 'VariableAtributtion', value: next.value, name: VariableCall.value, kind: 'numero' }
-            }
-         }
+    const operator = next;
+    current++;
 
-         throw new SyntaxError(`Erro com o Tipo da Variável! Tipo texto não pode receber ${next.type}`)
-      }
+    const right = parse();
+    return { type: "BinaryExpression", left, operator, right };
+  }
 
-      throw new SyntaxError(`Erro na atribuição de variável: ${VariableCall.value}, ${next.type}`)
-   } 
+  function parseBinaryExpression(
+    token: NumericLiteralToken,
+    next: AdditiveOperator
+  ): BinaryExpressionNode {
+    const left = parseNumericLiteral(token);
 
-   function parseStringOnQuotes(token: StringLiteralToken): StringNode {
-      current++
-      return { type: 'String', value: token.value }
-   }
+    const operator = next;
+    current++;
 
-   function parseStringConcatenation(token: StringLiteralToken, operator: PlusToken): BinaryExpressionNode {
-      const left = parseStringOnQuotes(token)
+    const right = parse();
+    return { type: "BinaryExpression", left, operator, right };
+  }
 
-      current++
-      const right: Node = parse()
+  function parseCallExpression(token: IdentifierToken): CallExpressionNode {
+    const identifier = token;
+    current++;
 
-      return { type: 'BinaryExpression', left, operator, right }
-   }
+    if (tokens[current]?.type !== "OpenParenToken") {
+      throw new SyntaxError(
+        `O identificador ${token.value} deve ser seguido de (, token recebido: ${tokens[current].type}`
+      );
+    }
+    current++;
 
-   function parseBinaryExpressionAny(node: Node, next: AdditiveOperator): BinaryExpressionNode {
-      const left = node
+    const argument: Node = parse();
 
-      const operator = next
-      current++
+    if (tokens[current]?.type !== "CloseParenToken") {
+      throw new SyntaxError(
+        `O identificador ${token.value} deve terminar com ), token recebido: ${tokens[current].type}`
+      );
+    }
+    current++;
 
-      const right = parse()
-      return { type: 'BinaryExpression', left, operator, right }
-   }
+    return { type: "CallExpression", identifier, argument };
+  }
 
-   function parseBinaryExpression(token: NumericLiteralToken, next: AdditiveOperator): BinaryExpressionNode {
-      const left = parseNumericLiteral(token)
+  function parseNumericLiteral(token: NumericLiteralToken): NumericLiteralNode {
+    current++;
+    return { type: "NumericLiteral", value: token.value };
+  }
 
-      const operator = next
-      current++
+  while (current < tokens.length) {
+    program.body.push(parse());
+  }
 
-      const right = parse()
-      return { type: 'BinaryExpression', left, operator, right }
-   }
-
-   function parseCallExpression(token: IdentifierToken): CallExpressionNode {
-      const identifier = token
-      current++
-
-      if (tokens[current]?.type !== 'OpenParenToken') {
-         throw new SyntaxError(`O identificador ${token.value} deve ser seguido de (, token recebido: ${tokens[current].type}`)
-      }
-      current++
-
-      const argument: Node = parse()
-
-      if (tokens[current]?.type !== 'CloseParenToken') {
-         throw new SyntaxError(`O identificador ${token.value} deve terminar com ), token recebido: ${tokens[current].type}`)
-      }
-      current++
-
-      return { type: 'CallExpression', identifier, argument }
-   }
-
-   function parseNumericLiteral(token: NumericLiteralToken): NumericLiteralNode {
-      current++
-      return { type: 'NumericLiteral', value: token.value }
-   }
-
-   while (current < tokens.length) {
-      program.body.push(parse())
-   }
-
-   return program
+  return program;
 }

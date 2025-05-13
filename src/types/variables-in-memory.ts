@@ -1,6 +1,6 @@
-import { VariableKinds } from "./types"
+import { VariableKinds } from "./types";
 
 export type VariablesInMemory = {
-   name: string,
-   kind: VariableKinds,
-}
+  name: string;
+  kind: VariableKinds;
+};
