@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { compiler } from "./compiler/compiler";
 import { interpreter } from "./compiler/interpreter";
-import { raypilerTerminalCompiler } from "./raypiler/raypiler";
+import { raypilerTerminalCompiler } from "./repl/raypiler";
 
 function main() {
   const args = process.argv;
@@ -39,10 +39,6 @@ function main() {
   ) {
     throw new Error("Não é possível ter mais de uma flag simultâneamente.");
   } else if (haveReplFlag) {
-    // Recebendo sempre o código e compilando por meio do Raypiler
-    console.clear();
-    console.log("🔥 Raypiler v0.1");
-
     // Iniciando o Raypiler no Terminal
     raypilerTerminalCompiler(debugMode);
   } else if (haveInterpreterFlag) {

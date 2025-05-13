@@ -16,7 +16,12 @@ const getValueFromTerminal = () => {
 };
 
 export const raypilerTerminalCompiler = async (debug: boolean) => {
+  console.clear();
+  console.log("🔥 Raypiler Repl v0.1");
+
+  // Recebendo sempre o código e compilando por meio do Raypiler
   let willContinue = true;
+
   while (willContinue) {
     const code = await getValueFromTerminal();
 
