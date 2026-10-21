@@ -1,5 +1,7 @@
 # Rayc 💜
 
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white) ![Status](https://img.shields.io/badge/status-experimental-orange?style=for-the-badge) ![Licença](https://img.shields.io/github/license/vitorhcesar/compilador-rayc?style=for-the-badge)
+
 **Rayc** é uma linguagem de programação com sintaxe em português. O nome é inspirado na minha esposa, **Rayssa**.
 
 Este repositório contém o **compilador da Rayc**, escrito em TypeScript: ele lê código `.rayc`, transforma em JavaScript e executa o resultado.
@@ -166,4 +168,6 @@ Baseado nos `TODO`s e nomes reservados no código:
 
 ## Autor
 
-Feito com 💜 por **Vítor H. Cesar** ([@vitorhcesar](https://github.com/vitorhcesar)), em homenagem à Rayssa.
+Feito com 💜 por **Vítor H. Cesar**, Desenvolvedor Full Stack, em homenagem à Rayssa.
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/vitorhcesar/) [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/vitorhcesar)
